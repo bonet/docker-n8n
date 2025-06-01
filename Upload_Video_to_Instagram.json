@@ -6,43 +6,11 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -180,
-        -160
+        0,
+        0
       ],
-      "id": "706e2a0e-dc2e-4813-a247-577d6a0b8b60",
+      "id": "4b3aa922-a969-4351-94ef-01549c5916b1",
       "name": "When clicking ‘Execute workflow’"
-    },
-    {
-      "parameters": {
-        "url": "={{ $json.video_url }}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        260,
-        -160
-      ],
-      "id": "fdb19789-5722-4700-9477-0ccae3004a76",
-      "name": "HTTP Request",
-      "alwaysOutputData": true
-    },
-    {
-      "parameters": {
-        "operation": "write",
-        "fileName": "=/data/my_app_files/{{ $('Set Filenames').item.json.in_file_name }}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.readWriteFile",
-      "typeVersion": 1,
-      "position": [
-        700,
-        -160
-      ],
-      "id": "9847b001-0119-4125-8a8d-32364342a663",
-      "name": "Read/Write Files from Disk",
-      "executeOnce": false,
-      "alwaysOutputData": true
     },
     {
       "parameters": {
@@ -56,10 +24,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        480,
-        -160
+        660,
+        0
       ],
-      "id": "6f841d7a-9d30-408f-92fe-8fc9743c29cf",
+      "id": "0e19fd6b-31b5-4924-b50e-6cfe805af455",
       "name": "Set Filenames",
       "alwaysOutputData": true
     },
@@ -72,10 +40,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        40,
-        -160
+        220,
+        0
       ],
-      "id": "d9542d85-d84c-41e8-bb71-c40f04cde1a7",
+      "id": "5c485d55-bda4-4437-9b8e-a4366f2a65bc",
       "name": "Set Configs"
     },
     {
@@ -110,10 +78,10 @@
       "type": "n8n-nodes-base.facebookGraphApi",
       "typeVersion": 1,
       "position": [
-        1580,
-        -160
+        1760,
+        0
       ],
-      "id": "6f330281-4ad9-4c58-9e61-c0950400ba22",
+      "id": "333b9cc2-342c-4177-b40c-339ae8e0bb25",
       "name": "1. Initialize Video Upload",
       "credentials": {
         "facebookGraphApi": {
@@ -149,10 +117,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2020,
-        -160
+        2200,
+        0
       ],
-      "id": "fc75e79a-d798-45cb-9d43-2d13fbefe7f0",
+      "id": "804f8a6f-6951-4155-820e-1690ba01fc9f",
       "name": "2. Upload Video to Reels",
       "alwaysOutputData": true,
       "credentials": {
@@ -169,10 +137,10 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        920,
-        -160
+        1100,
+        0
       ],
-      "id": "43701243-308a-446a-bbb2-9ea0bc43ada6",
+      "id": "81bb7a84-ca8a-4d7e-83d2-c983ba9b3fb8",
       "name": "Command: Convert to H265",
       "alwaysOutputData": true
     },
@@ -183,10 +151,10 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        1140,
-        -160
+        1320,
+        0
       ],
-      "id": "01980b3a-aa48-4d27-b5fe-322953edb50e",
+      "id": "8bed9eb3-1ae7-44fd-a8cf-261d37b52e99",
       "name": "Command: Get File Size"
     },
     {
@@ -198,11 +166,43 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1360,
-        -160
+        1540,
+        0
       ],
-      "id": "251b4432-b69c-4a9e-bc1d-3f7f511425da",
+      "id": "4af8d840-b193-4e58-92b8-f61733528b5a",
       "name": "Set: out_file_size"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.video_url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "319ec402-4821-4309-97e5-de623aec0339",
+      "name": "Download Video File using HTTP",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/data/my_app_files/{{ $('Set Filenames').item.json.in_file_name }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        880,
+        0
+      ],
+      "id": "78bb8ea8-e097-4a81-b9b6-4d1d86a25857",
+      "name": "Write Initial Video File to Disk",
+      "executeOnce": false,
+      "alwaysOutputData": true
     },
     {
       "parameters": {
@@ -212,11 +212,11 @@
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,
       "position": [
-        1800,
-        -160
+        1980,
+        0
       ],
-      "id": "908a4e5f-060c-4dd3-9b8b-69a7e18abf8c",
-      "name": "1.1 Read/Write Files from Disk1"
+      "id": "0992e8bd-ac9e-482f-aa83-d2d7670524a2",
+      "name": "1.1 Read H265 file to 'data'"
     },
     {
       "parameters": {
@@ -238,17 +238,30 @@
       "type": "n8n-nodes-base.facebookGraphApi",
       "typeVersion": 1,
       "position": [
-        2240,
-        -160
+        2420,
+        0
       ],
-      "id": "e3c6141c-eecd-482c-bae2-6214026b6840",
-      "name": "Facebook Graph API",
+      "id": "02951a94-9d9b-4f9c-89c0-9377a80ea8b4",
+      "name": "3. Publish Reel Container",
       "credentials": {
         "facebookGraphApi": {
           "id": "LwxjUFrKuTWfkW0D",
           "name": "Facebook Graph account"
         }
       }
+    },
+    {
+      "parameters": {
+        "command": "=rm /data/my_app_files/{{ $('Set Filenames').item.json.in_file_name }}\nrm /data/my_app_files/{{ $('Set Filenames').item.json.out_file_name }}"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        2620,
+        0
+      ],
+      "id": "dc349ba3-94d3-4e7b-9ad7-fee70fb51c1e",
+      "name": "Execute Command"
     }
   ],
   "pinData": {},
@@ -264,33 +277,11 @@
         ]
       ]
     },
-    "HTTP Request": {
-      "main": [
-        [
-          {
-            "node": "Set Filenames",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Read/Write Files from Disk": {
-      "main": [
-        [
-          {
-            "node": "Command: Convert to H265",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Set Filenames": {
       "main": [
         [
           {
-            "node": "Read/Write Files from Disk",
+            "node": "Write Initial Video File to Disk",
             "type": "main",
             "index": 0
           }
@@ -301,7 +292,7 @@
       "main": [
         [
           {
-            "node": "HTTP Request",
+            "node": "Download Video File using HTTP",
             "type": "main",
             "index": 0
           }
@@ -312,7 +303,7 @@
       "main": [
         [
           {
-            "node": "1.1 Read/Write Files from Disk1",
+            "node": "1.1 Read H265 file to 'data'",
             "type": "main",
             "index": 0
           }
@@ -356,18 +347,51 @@
       "main": [
         [
           {
-            "node": "Facebook Graph API",
+            "node": "3. Publish Reel Container",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "1.1 Read/Write Files from Disk1": {
+    "Download Video File using HTTP": {
+      "main": [
+        [
+          {
+            "node": "Set Filenames",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Initial Video File to Disk": {
+      "main": [
+        [
+          {
+            "node": "Command: Convert to H265",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1.1 Read H265 file to 'data'": {
       "main": [
         [
           {
             "node": "2. Upload Video to Reels",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "3. Publish Reel Container": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
             "type": "main",
             "index": 0
           }
@@ -379,11 +403,10 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "907eeb8c-573d-4ab3-85af-86f73b4053d3",
+  "versionId": "ce422fd2-e066-4ca2-87c3-09bd320ebd07",
   "meta": {
-    "templateCredsSetupCompleted": true,
     "instanceId": "042bdb9c5082048b6e544e91b78ef471fbd2d529dfdc7f7585567fb5aa3bedaf"
   },
-  "id": "onID2N1t9ZYLswm2",
+  "id": "wiGaF9E3Zb0fOKrd",
   "tags": []
 }
