@@ -1,0 +1,27 @@
+services:
+  init_my_app_files:
+    image: alpine:latest
+    command: >
+      sh -c "mkdir -p /data/my_app_files && chmod 755 /data/my_app_files && chown 1000:1000 /data/my_app_files"
+    volumes:
+      - my_app_files:/data/my_app_files
+  n8n:
+    build: .
+    environment:
+      - N8N_PAYLOAD_SIZE_MAX=300000000
+      - N8N_FILES_BASE_PATH=/home/node/.n8n
+      - N8N_DEFAULT_BINARY_DATA_MODE=filesystem
+      - GENERIC_TIMEZONE=Asia/Jakarta
+      - TZ=Asia/Jakarta
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n_files:/home/node/.n8n
+      - my_app_files:/data/my_app_files
+    user: "1000:1000"
+    depends_on:
+      - init_my_app_files
+volumes:
+  n8n_data:
+  my_app_files:
