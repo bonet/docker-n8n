@@ -1,0 +1,389 @@
+{
+  "name": "Upload Video to Instagram",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -180,
+        -160
+      ],
+      "id": "706e2a0e-dc2e-4813-a247-577d6a0b8b60",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.video_url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        -160
+      ],
+      "id": "fdb19789-5722-4700-9477-0ccae3004a76",
+      "name": "HTTP Request",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/data/my_app_files/{{ $('Set Filenames').item.json.in_file_name }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        700,
+        -160
+      ],
+      "id": "9847b001-0119-4125-8a8d-32364342a663",
+      "name": "Read/Write Files from Disk",
+      "executeOnce": false,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"in_file_name\": \"in_{{$now.toMillis()}}.{{$binary.data.fileExtension}}\",\n  \"out_file_name\": \"out_{{$now.toMillis()}}.{{$binary.data.fileExtension}}\",\n}\n",
+        "includeOtherFields": true,
+        "include": "selected",
+        "includeFields": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        480,
+        -160
+      ],
+      "id": "6f841d7a-9d30-408f-92fe-8fc9743c29cf",
+      "name": "Set Filenames",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"image_url\": \"https://i.imgur.com/3Y3cDXb.jpeg\",\n  \"video_url\": \"https://t9018725894.p.clickup-attachments.com/t9018725894/495d15fb-a193-47b0-8335-1462f73f280f/Untitled%20video%20-%20Made%20with%20Clipchamp.mp4?view=open\",\n\"ig_user_id\": \"17841473391381006\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        40,
+        -160
+      ],
+      "id": "d9542d85-d84c-41e8-bb71-c40f04cde1a7",
+      "name": "Set Configs"
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v22.0",
+        "node": "={{$('Set Configs').item.json.ig_user_id}}",
+        "edge": "media",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "media_type",
+                "value": "REELS"
+              },
+              {
+                "name": "upload_type",
+                "value": "resumable"
+              },
+              {
+                "name": "cover_url",
+                "value": "={{$('Set Configs').item.json.image_url}}"
+              },
+              {
+                "name": "thumb_offset",
+                "value": "0"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        1580,
+        -160
+      ],
+      "id": "6f330281-4ad9-4c58-9e61-c0950400ba22",
+      "name": "1. Initialize Video Upload",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "LwxjUFrKuTWfkW0D",
+          "name": "Facebook Graph account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('1. Initialize Video Upload').item.json.uri }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "facebookGraphApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "offset",
+              "value": "0"
+            },
+            {
+              "name": "file_size",
+              "value": "={{ $('Set: out_file_size').item.json.out_file_size }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2020,
+        -160
+      ],
+      "id": "fc75e79a-d798-45cb-9d43-2d13fbefe7f0",
+      "name": "2. Upload Video to Reels",
+      "alwaysOutputData": true,
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "LwxjUFrKuTWfkW0D",
+          "name": "Facebook Graph account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=cd /data/my_app_files\nffmpeg -i {{ $('Set Filenames').item.json.in_file_name }} -c:v libx265 -crf 28 -c:a aac -b:a 128k {{ $('Set Filenames').item.json.out_file_name }}"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        920,
+        -160
+      ],
+      "id": "43701243-308a-446a-bbb2-9ea0bc43ada6",
+      "name": "Command: Convert to H265",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "command": "=stat -c %s /data/my_app_files/{{ $('Set Filenames').item.json.out_file_name }}"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        -160
+      ],
+      "id": "01980b3a-aa48-4d27-b5fe-322953edb50e",
+      "name": "Command: Get File Size"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"out_file_size\":  {{ $json.stdout }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1360,
+        -160
+      ],
+      "id": "251b4432-b69c-4a9e-bc1d-3f7f511425da",
+      "name": "Set: out_file_size"
+    },
+    {
+      "parameters": {
+        "fileSelector": "=/data/my_app_files/{{ $('Set Filenames').item.json.out_file_name }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        -160
+      ],
+      "id": "908a4e5f-060c-4dd3-9b8b-69a7e18abf8c",
+      "name": "1.1 Read/Write Files from Disk1"
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v22.0",
+        "node": "={{ $('Set Configs').item.json.ig_user_id }}",
+        "edge": "media_publish",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "creation_id",
+                "value": "={{ $('1. Initialize Video Upload').item.json.id }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        2240,
+        -160
+      ],
+      "id": "e3c6141c-eecd-482c-bae2-6214026b6840",
+      "name": "Facebook Graph API",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "LwxjUFrKuTWfkW0D",
+          "name": "Facebook Graph account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Set Configs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Set Filenames",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Command: Convert to H265",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Filenames": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Configs": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1. Initialize Video Upload": {
+      "main": [
+        [
+          {
+            "node": "1.1 Read/Write Files from Disk1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Command: Convert to H265": {
+      "main": [
+        [
+          {
+            "node": "Command: Get File Size",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Command: Get File Size": {
+      "main": [
+        [
+          {
+            "node": "Set: out_file_size",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set: out_file_size": {
+      "main": [
+        [
+          {
+            "node": "1. Initialize Video Upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2. Upload Video to Reels": {
+      "main": [
+        [
+          {
+            "node": "Facebook Graph API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1.1 Read/Write Files from Disk1": {
+      "main": [
+        [
+          {
+            "node": "2. Upload Video to Reels",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "907eeb8c-573d-4ab3-85af-86f73b4053d3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "042bdb9c5082048b6e544e91b78ef471fbd2d529dfdc7f7585567fb5aa3bedaf"
+  },
+  "id": "onID2N1t9ZYLswm2",
+  "tags": []
+}
